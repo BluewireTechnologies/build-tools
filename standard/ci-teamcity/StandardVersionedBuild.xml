@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta-runner name="Standard Versioned Build">
+  <description>Standard build, with semantic and auto-versioning.</description>
+  <settings>
+    <parameters>
+      <param name="OutputDirectory" value="%system.teamcity.build.tempDir%\Output" spec="text label='Output Directory'" />
+      <param name="Configuration" value="Release" spec="select label='Build mode' data_1='Release' data_2='Debug'" />
+      <param name="SourceBranch" value="%teamcity.build.branch%" spec="text label='Semantic branch' description='Branch from which semantic tag information will be inferred.'" />
+      <param name="MasterBranchSemanticTag" value="" spec="text label='Semantic tag for master'" />
+    </parameters>
+    <build-runners>
+      <runner name="Set Version from Git" type="jetbrains_powershell">
+        <parameters>
+          <param name="jetbrains_powershell_bitness" value="x86" />
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_scriptArguments" value="-workingRoot %system.teamcity.build.checkoutDir%" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[param(
+    [string]$workingRoot
+)
+
+Trap {
+    Write-Host $error;
+    Write-Host "Failed to determine version number.";
+    exit 2;
+}
+$ErrorActionPreference = "Stop";
+
+function Die([int]$code, [string]$error)
+{
+    Write-Host $error;
+    exit $code;
+}
+
+if (-not (Test-Path "${workingRoot}")) { Die 4 "Working copy directory does not exist: ${workingRoot}"; }
+$gitDir = "${workingRoot}\.git";
+if (-not (Test-Path "${gitDir}")) { Die 4 "Not a Git repository: ${gitDir}"; }
+
+function Invoke-Git()
+{
+    git -C "${workingRoot}" @args;
+}
+
+function Test-Tag([string]$tagName)
+{
+    Invoke-Git show-ref --verify --quiet "refs/tags/${tagName}" 2>&1 | Out-Null;
+    return !!$?;
+}
+
+function Count-Revisions([string]$tagName)
+{
+    Invoke-Git rev-list "${majorMinor}..HEAD" --count;
+    if (!$?) { Die 3 "git rev-list returned error code $LASTEXITCODE"; }
+}
+
+function Put-Parameter($name, $value)
+{
+    Write-Host "##teamcity[setParameter name='$name' value='$value']"
+}
+
+
+if (-not (Test-Path "${workingRoot}\.current-version")) { Die 0 "No .current-version file present. No attempt will be made to infer version number."; }
+
+$majorMinor = $(get-content "${workingRoot}\.current-version");
+if (-not $majorMinor) { Die 0 "The .current-version file is empty. No attempt will be made to infer version number."; }
+$majorMinor = $majorMinor.Trim();
+if (-not $majorMinor) { Die 0 "The .current-version file is empty. No attempt will be made to infer version number."; }
+
+if (-not (Test-Tag "${majorMinor}")) { Die 2 "Could not find a tag with the name '${majorMinor}'." }
+
+$buildNumber = $(Count-Revisions $majorMinor);
+if(-not $buildNumber) { Die 2 "Could not determine topological build number for this version."; }
+
+$m = $majorMinor -match '^(?<major>[0-9]+)\.(?<minor>[0-9]+)$';
+if(!$m) { Die 2 "Unable to parse major.minor version number: '${majorMinor}'"; }
+
+$version = [string]::Join('.', @(
+    $matches['major'],
+    $matches['minor'],
+    $buildNumber
+));
+
+Put-Parameter "git.describe" $(Invoke-Git describe --tags --long --match "${majorMinor}")
+Put-Parameter "git.seq" $buildNumber;
+Put-Parameter "git.hash" $(Invoke-Git rev-parse --short HEAD)
+Put-Parameter 'system.Version' $version;
+
+Write-Host "##teamcity[buildNumber '$version']"]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="default" />
+        </parameters>
+      </runner>
+      <runner name="Set SemanticTag from branch name" type="jetbrains_powershell">
+        <parameters>
+          <param name="jetbrains_powershell_bitness" value="x86" />
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_scriptArguments" value="-currentBranch %SourceBranch% -commitIdentifier %build.vcs.number% -trimIdentifierLength 10 -masterBranchSemanticTag &quot;%MasterBranchSemanticTag%&quot;" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[param(
+    [string]$currentBranch,
+    [string]$masterBranchSemanticTag,
+    [string]$commitIdentifier,
+    [int]$trimIdentifierLength = $null
+)
+
+Trap {
+    Write-Host $error;
+    Write-Host "Failed to determine version number.";
+    exit 2;
+}
+$ErrorActionPreference = "Stop";
+
+function Get-CommitId()
+{
+    if ($trimIdentifierLength -and $commitIdentifier.Length -gt $trimIdentifierLength) {
+        return $commitIdentifier.Substring(0, $trimIdentifierLength);
+    }
+    return $commitIdentifier;
+}
+
+function Get-MasterBranchSemanticTag()
+{
+    return $masterBranchSemanticTag;
+}
+
+function Put-Parameter($name, $value)
+{
+    Write-Host "##teamcity[setParameter name='$name' value='$value']"
+}
+
+function Get-SemanticTag($lowercaseBranch, $commitId, $masterTag)
+{
+    if ($lowercaseBranch.StartsWith("canary/")) { return "canary"; }
+    if ($lowercaseBranch.StartsWith("candidate/")) { return "rc"; }
+    if ($lowercaseBranch.StartsWith("release/")) { return "release"; }
+    if ($lowercaseBranch.Equals("master")) { return "${masterTag}"; }
+    return "alpha.${commitId}";
+}
+
+$commitId = Get-CommitId;
+$masterTag = Get-MasterBranchSemanticTag;
+$semanticTag = Get-SemanticTag $currentBranch.ToLower() $commitId $masterTag;
+
+Put-Parameter 'system.SemanticTag' $semanticTag;]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="default" />
+        </parameters>
+      </runner>
+      <runner name="Build and Package" type="MSBuild">
+        <parameters>
+          <param name="build-file-path" value="TeamCity.Task.proj" />
+          <param name="dotNetCoverage.NCover.HTMLReport.File.Sort" value="0" />
+          <param name="dotNetCoverage.NCover.HTMLReport.File.Type" value="1" />
+          <param name="dotNetCoverage.NCover.Reg" value="selected" />
+          <param name="dotNetCoverage.NCover.platformBitness" value="x86" />
+          <param name="dotNetCoverage.NCover.platformVersion" value="v2.0" />
+          <param name="dotNetCoverage.NCover3.Reg" value="selected" />
+          <param name="dotNetCoverage.NCover3.args" value="//ias .*" />
+          <param name="dotNetCoverage.NCover3.platformBitness" value="x86" />
+          <param name="dotNetCoverage.NCover3.platformVersion" value="v2.0" />
+          <param name="dotNetCoverage.NCover3.reporter.executable.args" value="//or FullCoverageReport:Html:{teamcity.report.path}" />
+          <param name="dotNetCoverage.PartCover.Reg" value="selected" />
+          <param name="dotNetCoverage.PartCover.includes" value="[*]*" />
+          <param name="dotNetCoverage.PartCover.platformBitness" value="x86" />
+          <param name="dotNetCoverage.PartCover.platformVersion" value="v2.0" />
+          <param name="msbuild_version" value="14.0" />
+          <param name="run-platform" value="x86" />
+          <param name="targets" value="BuildAndPackage" />
+          <param name="teamcity.step.mode" value="default" />
+          <param name="toolsVersion" value="14.0" />
+        </parameters>
+      </runner>
+    </build-runners>
+    <requirements />
+  </settings>
+</meta-runner>
+

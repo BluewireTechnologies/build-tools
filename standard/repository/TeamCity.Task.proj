@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="BuildAndTest" ToolsVersion="12.0">
+
+    <!--
+
+    Standard Build Script
+    Intended to isolate the codebase from the details of the CI server.
+
+    Inputs:
+      * OutputDirectory:  location for final build output
+      * Version:          (optional) version number to use for auto-versioned projects
+      * SemanticTag:      (optional) semantic tag to apply to auto- and SemVer-versioned projects (default: alpha)
+
+    Outputs:
+      * Everything in OutputDirectory
+
+    Do not customise this file. Add projects or override constants in Build.props.
+
+    -->
+
+    <Import Project="Common.props" />
+    <Import Project="Common.targets" />
+
+    <PropertyGroup>
+        <WorkingDirectory>$(MSBuildProjectDirectory)</WorkingDirectory>
+        <Version></Version>
+        <SemanticTag>alpha</SemanticTag>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <SemVerProjects Include="$(MSBuildProjectDirectory)\**\*.Contracts.csproj"  />
+    </ItemGroup>
+
+    <ItemDefinitionGroup>
+        <NugetProjects></NugetProjects>
+        <NUnitProjects></NUnitProjects>
+        <OutputBinaries></OutputBinaries>
+    </ItemDefinitionGroup>
+
+    <!-- Do not add project references to this file. Add them in Build.props instead. -->
+
+    <Import Project="Build.props" />
+
+    <Target DependsOnTargets="ValidateParameters;PrepareOutputDirectory;ApplyAutoVersionNumber;ApplySemanticVersionNumber" Name="Build">
+        <MSBuild Projects="@(NugetProjects)" Targets="Build" ToolsVersion="$(PreferredMSBuildToolsVersion)" BuildInParallel="true" Properties="Configuration=$(Configuration)" />
+    </Target>
+
+    <Target Name="BuildAndTest" DependsOnTargets="Build;RunNUnitTests">
+    </Target>
+
+    <Target Name="BuildAndPackage" DependsOnTargets="BuildAndTest">
+        <MSBuild Projects="@(NugetProjects)" Targets="BuildPackage" ToolsVersion="$(PreferredMSBuildToolsVersion)" BuildInParallel="true" Properties="RunNuGetPack=true;Configuration=$(Configuration);NugetPackageTargetDir=$(OutputDirectory)"/>
+        <Copy SourceFiles="@(OutputBinaries)" DestinationFiles="@(OutputBinaries->'$(OutputDirectory)\%(FileName)%(Extension)')" />
+    </Target>
+
+    <Target Name="PrepareOutputDirectory" DependsOnTargets="ValidateParameters">
+        <MakeDir Directories="$(OutputDirectory)" />
+    </Target>
+
+    <Target Name="ValidateParameters">
+        <Warning Text="Version was not specified" Condition="'$(Version)' == ''" />
+        <Error Text="OutputDirectory was not specified" Condition="'$(OutputDirectory)' == ''" />
+
+        <!-- Make paths absolute -->
+        <CombinePath BasePath="$(MSBuildProjectDirectory)" Paths="$(OutputDirectory)">
+            <Output TaskParameter="CombinedPaths" PropertyName="OutputDirectory" />
+        </CombinePath>
+
+        <Message Text="Source Version:   $(Version)" />
+        <Message Text="Semantic Tag:     $(SemanticTag)" />
+        <Message Text="Output Directory: $(OutputDirectory)" />
+    </Target>
+</Project>

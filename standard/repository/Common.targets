@@ -48,6 +48,19 @@
 
     <Exec Command='"$(NUnitRunnerPath)" --teamcity "%(NUnitTestProjects.TargetPath)"' />
   </Target>
+  
+  <Target Name="PrepareNuGetPack">
+    <ItemGroup>
+      <_MSBuildNuGetPackVersion1 Include="packages\MsBuild.NuGet.Pack.1.*\*.nupkg" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <BuildAndPackageProperties Include="RunNuGetPack=true" />
+        <BuildAndPackageProperties Include="IncludeBuildVersion=true" />
+        <BuildAndPackageProperties Include="NugetPackageTargetDir=$(OutputDirectory)" Condition="'@(_MSBuildNuGetPackVersion1)' != ''" />
+        <BuildAndPackageProperties Include="NugetPackageOutDir=$(OutputDirectory)" />
+    </ItemGroup>
+  </Target>
 
   <!-- BEGIN Versioning targets -->
 

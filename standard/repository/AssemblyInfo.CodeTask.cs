@@ -30,7 +30,7 @@ public class AssemblyInfo : Microsoft.Build.Utilities.Task
     private AttributeInfo assemblyFileVersion = new AttributeInfo(typeof(AssemblyFileVersionAttribute));
     private AttributeInfo assemblyInformationalVersion = new AttributeInfo(typeof(AssemblyInformationalVersionAttribute));
 
-    private static Regex rxAttribute = new Regex(@"^\s*  \[  \s*assembly\s*:\s*  (?<name>\w+)  \s*\(\s*@? ""  (?<parameter>.*)  ""  \s*\)\s*  \]", RegexOptions.IgnorePatternWhitespace);
+    private static Regex rxAttribute = new Regex(@"^\s*  \[  \s*assembly\s*:\s*  (?<name>[\.\w]+)  \s*\(\s*@? ""  (?<parameter>.*)  ""  \s*\)\s*  \]", RegexOptions.IgnorePatternWhitespace);
 
     public override bool Execute()
     {

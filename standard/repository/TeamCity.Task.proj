@@ -47,9 +47,9 @@
 
     <Target Name="BuildAndTest" DependsOnTargets="Build;RunNUnitTests">
     </Target>
-
-    <Target Name="BuildAndPackage" DependsOnTargets="BuildAndTest">
-        <MSBuild Projects="@(NugetProjects)" Targets="BuildPackage" ToolsVersion="$(PreferredMSBuildToolsVersion)" BuildInParallel="true" Properties="RunNuGetPack=true;Configuration=$(Configuration);NugetPackageTargetDir=$(OutputDirectory)"/>
+   
+    <Target Name="BuildAndPackage" DependsOnTargets="BuildAndTest;PrepareNuGetPack">
+        <MSBuild Projects="@(NugetProjects)" Targets="BuildPackage" ToolsVersion="$(PreferredMSBuildToolsVersion)" BuildInParallel="true" Properties="Configuration=$(Configuration);@(BuildAndPackageProperties)"/>
         <Copy SourceFiles="@(OutputBinaries)" DestinationFiles="@(OutputBinaries->'$(OutputDirectory)\%(FileName)%(Extension)')" />
     </Target>
 

@@ -28,13 +28,19 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <!-- Projects which are assumed to specify their version number explicitly. Only semantic tags will be generated. -->
         <SemVerProjects Include="$(MSBuildProjectDirectory)\**\*.Contracts.csproj"  />
     </ItemGroup>
 
     <ItemDefinitionGroup>
+        <!-- Projects which reference MSBuild.NuGet.Pack and use it to produce NuGet packages. -->
         <NugetProjects></NugetProjects>
+        <!-- NUnit test projects. -->
         <NUnitProjects></NUnitProjects>
+        <!-- Specific binary files which should be copied directly to the output directory. -->
         <OutputBinaries></OutputBinaries>
+        <!-- Projects which produce files which should be copied directly to the output directory. -->
+        <OutputBinaryProjects></OutputBinaryProjects>
     </ItemDefinitionGroup>
 
     <!-- Do not add project references to this file. Add them in Build.props instead. -->
@@ -43,6 +49,9 @@
 
     <Target DependsOnTargets="ValidateParameters;PrepareOutputDirectory;ApplyAutoVersionNumber;ApplySemanticVersionNumber" Name="Build">
         <MSBuild Projects="@(NugetProjects)" Targets="Build" ToolsVersion="$(PreferredMSBuildToolsVersion)" BuildInParallel="true" Properties="Configuration=$(Configuration)" />
+        <MSBuild Projects="@(OutputBinaryProjects)" Targets="Build" ToolsVersion="$(PreferredMSBuildToolsVersion)" BuildInParallel="true" Properties="Configuration=$(Configuration)">
+            <Output TaskParameter="TargetOutputs" ItemName="OutputBinaries" />
+        </MSBuild>
     </Target>
 
     <Target Name="BuildAndTest" DependsOnTargets="Build;RunNUnitTests">

@@ -63,7 +63,7 @@
     <Target Name="BuildAndPackage" DependsOnTargets="BuildAndTest;PrepareNuGetPack">
         <MSBuild Projects="@(NugetProjects)" Targets="BuildPackage" ToolsVersion="$(PreferredMSBuildToolsVersion)" BuildInParallel="true" Properties="Configuration=$(Configuration);@(BuildAndPackageProperties)"/>
         <Copy SourceFiles="@(OutputBinaries)" DestinationFiles="@(OutputBinaries->'$(OutputDirectory)\%(FileName)%(Extension)')" />
-        <MSBuild Projects="@(OctoPackProjects)" Targets="OctoPack" ToolsVersion="$(PreferredMSBuildToolsVersion)" BuildInParallel="true" Properties="Configuration=$(Configuration);RunOctoPack=true;OctoPackPublishPackageToFileShare=$(OutputDirectory)" />
+        <MSBuild Projects="@(OctoPackProjects)" Targets="Build" ToolsVersion="$(PreferredMSBuildToolsVersion)" BuildInParallel="true" Properties="Configuration=$(Configuration);RunOctoPack=true;OctoPackPublishPackageToFileShare=$(OutputDirectory)" />
     </Target>
 
     <Target Name="PrepareOutputDirectory" DependsOnTargets="ValidateParameters">

@@ -37,6 +37,8 @@
         <NugetProjects></NugetProjects>
         <!-- NUnit test projects. -->
         <NUnitProjects></NUnitProjects>
+        <!-- Projects which reference OctoPack and use it to produce Octopus packages. -->
+        <OctoPackProjects></OctoPackProjects>
         <!-- Specific binary files which should be copied directly to the output directory. -->
         <OutputBinaries></OutputBinaries>
         <!-- Projects which produce files which should be copied directly to the output directory. -->
@@ -52,6 +54,7 @@
         <MSBuild Projects="@(OutputBinaryProjects)" Targets="Build" ToolsVersion="$(PreferredMSBuildToolsVersion)" BuildInParallel="true" Properties="Configuration=$(Configuration)">
             <Output TaskParameter="TargetOutputs" ItemName="OutputBinaries" />
         </MSBuild>
+        <MSBuild Projects="@(OctoPackProjects)" Targets="Build" ToolsVersion="$(PreferredMSBuildToolsVersion)" BuildInParallel="true" Properties="Configuration=$(Configuration)" />
     </Target>
 
     <Target Name="BuildAndTest" DependsOnTargets="Build;RunNUnitTests">
@@ -60,6 +63,7 @@
     <Target Name="BuildAndPackage" DependsOnTargets="BuildAndTest;PrepareNuGetPack">
         <MSBuild Projects="@(NugetProjects)" Targets="BuildPackage" ToolsVersion="$(PreferredMSBuildToolsVersion)" BuildInParallel="true" Properties="Configuration=$(Configuration);@(BuildAndPackageProperties)"/>
         <Copy SourceFiles="@(OutputBinaries)" DestinationFiles="@(OutputBinaries->'$(OutputDirectory)\%(FileName)%(Extension)')" />
+        <MSBuild Projects="@(OctoPackProjects)" Targets="OctoPack" ToolsVersion="$(PreferredMSBuildToolsVersion)" BuildInParallel="true" Properties="Configuration=$(Configuration);RunOctoPack=true;OctoPackPublishPackageToFileShare=$(OutputDirectory)" />
     </Target>
 
     <Target Name="PrepareOutputDirectory" DependsOnTargets="ValidateParameters">

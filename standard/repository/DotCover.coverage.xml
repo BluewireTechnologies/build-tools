@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CoverageParams>
+  <Filters>
+    <ExcludeFilters>
+      <!-- Default exclusions -->
+      <FilterEntry><ModuleMask>*Tests</ModuleMask></FilterEntry>
+      <FilterEntry><ModuleMask>*.Contracts</ModuleMask></FilterEntry>
+      <FilterEntry><ModuleMask>*.Contracts.*</ModuleMask></FilterEntry>
+    </ExcludeFilters>
+  </Filters>
+</CoverageParams>

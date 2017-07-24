@@ -7,4 +7,7 @@
         <!-- Full list of NUnit test projects -->
         <NUnitProjects Include="**\*.UnitTests.csproj" />
     </ItemGroup>
+    <PropertyGroup>
+        <DotCoverConfigurationFile>DotCover.coverage.xml</DotCoverConfigurationFile>
+    </PropertyGroup>
 </Project>

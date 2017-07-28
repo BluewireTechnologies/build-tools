@@ -65,6 +65,9 @@ if (-not $majorMinor) { Die 0 "The .current-version file is empty. No attempt wi
 $majorMinor = $majorMinor.Trim();
 if (-not $majorMinor) { Die 0 "The .current-version file is empty. No attempt will be made to infer version number."; }
 
+# Ensure that the version base tag is actually known to the local repository:
+Invoke-Git fetch origin tag "${majorMinor}"
+
 if (-not (Test-Tag "${majorMinor}")) { Die 2 "Could not find a tag with the name '${majorMinor}'." }
 
 $buildNumber = $(Count-Revisions $majorMinor);

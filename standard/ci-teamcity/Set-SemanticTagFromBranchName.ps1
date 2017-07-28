@@ -36,7 +36,7 @@ function Get-SemanticTag($lowercaseBranch, $commitId, $masterTag)
     if ($lowercaseBranch.StartsWith("candidate/")) { return "rc"; }
     if ($lowercaseBranch.StartsWith("release/")) { return "release"; }
     if ($lowercaseBranch.Equals("master")) { return "${masterTag}"; }
-    return "alpha.${commitId}";
+    return "alpha.g${commitId}";
 }
 
 $commitId = Get-CommitId;

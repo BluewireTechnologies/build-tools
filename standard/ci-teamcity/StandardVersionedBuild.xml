@@ -7,6 +7,8 @@
       <param name="Configuration" value="Release" spec="select label='Build mode' data_1='Release' data_2='Debug'" />
       <param name="SourceBranch" value="%teamcity.build.branch%" spec="text label='Semantic branch' description='Branch from which semantic tag information will be inferred.'" />
       <param name="MasterBranchSemanticTag" value="" spec="text label='Semantic tag for master'" />
+      <param name="MSBuildToolsVersion" value="14.0" spec="select label='MSBuild version' data_1='14.0' data_2='15.0'" />
+      <param name="MSBuildPlatform" value="x64" spec="select label='MSBuild platform' data_1='x86' data_2='x64'" />
     </parameters>
     <build-runners>
       <runner name="Set Version from Git" type="jetbrains_powershell">
@@ -164,11 +166,11 @@ Put-Parameter 'system.SemanticTag' $semanticTag;]]></param>
           <param name="dotNetCoverage.PartCover.includes" value="[*]*" />
           <param name="dotNetCoverage.PartCover.platformBitness" value="x86" />
           <param name="dotNetCoverage.PartCover.platformVersion" value="v2.0" />
-          <param name="msbuild_version" value="14.0" />
-          <param name="run-platform" value="x86" />
+          <param name="msbuild_version" value="%MSBuildToolsVersion%" />
+          <param name="run-platform" value="%MSBuildPlatform%" />
           <param name="targets" value="BuildAndPackage" />
           <param name="teamcity.step.mode" value="default" />
-          <param name="toolsVersion" value="14.0" />
+          <param name="toolsVersion" value="%MSBuildToolsVersion%" />
         </parameters>
       </runner>
     </build-runners>

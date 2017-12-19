@@ -74,13 +74,13 @@
     </PropertyGroup>
     <Message Text="Coverage tool: $(CoverageToolName)" />
   </Target>
-  
+
   <Target Name="RunNUnitTests" DependsOnTargets="_SelectCoverageTool;RunNUnitTestsOnly;RunNUnitTestsWithDotCover">
   </Target>
-  
+
   <Target Name="RunNUnitTestsOnly" Condition="'$(CoverageToolName)' == '*NONE*'" DependsOnTargets="_RunNUnitTestsOnly">
   </Target>
-  
+
   <Target Name="_RunNUnitTestsOnly" Inputs="@(NUnitTestProjects)" Outputs="%(Identity).skip" DependsOnTargets="PrepareNUnitRunner;BuildNUnitTestAssemblies">
     <Message Text="%(NUnitTestProjects.Identity):" />
     <Message Text="     %(NUnitTestProjects.TargetPath)" />
@@ -90,7 +90,7 @@
 
     <Exec Command='"$(NUnitRunnerPath)" --teamcity "%(NUnitTestProjects.TargetPath)"' />
   </Target>
-  
+
   <Target Name="RunNUnitTestsWithDotCover" Condition="'$(CoverageToolName)' == 'DotCover'" DependsOnTargets="_RunNUnitTestsWithDotCover">
     <PropertyGroup>
       <DotCoverMergedSnapshotPath>_DotCoverMergedSnapshot.dcvr</DotCoverMergedSnapshotPath>
@@ -101,7 +101,7 @@
     <Exec Condition="'$(DotCoverHtmlReportPath)' != ''" Command='"$(DotCoverRunnerPath)" report /Source="$(DotCoverMergedSnapshotPath)" /Output="$(DotCoverHtmlReportPath)" /ReportType=HTML' />
 
   </Target>
-  
+
   <Target Name="_RunNUnitTestsWithDotCover" Inputs="@(NUnitTestProjects)" Outputs="%(Identity).skip" DependsOnTargets="PrepareNUnitRunner;PrepareDotCover;BuildNUnitTestAssemblies">
     <Message Text="%(NUnitTestProjects.Identity):" />
     <Message Text="     %(NUnitTestProjects.TargetPath)" />
@@ -124,7 +124,7 @@
       <DotCoverSnapshots Include="%(NUnitTestProjects.DotCoverSnapshot)" />
     </ItemGroup>
   </Target>
-  
+
   <Target Name="PrepareNuGetPack">
     <ItemGroup>
       <_MSBuildNuGetPackVersion1 Include="packages\MsBuild.NuGet.Pack.1.*\*.nupkg" />
@@ -194,7 +194,7 @@
         />
   </Target>
 
-  <UsingTask TaskName="AssemblyInfo" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+  <UsingTask TaskName="AssemblyInfo" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" Condition="'$(MSBuildToolsVersion)' &lt; '15'">
     <ParameterGroup>
       <FileName ParameterType="System.String" Required="true" />
       <AssemblyVersion ParameterType="System.String" Required="false" Output="true" />
@@ -204,6 +204,18 @@
     <Task>
       <Reference Include="$(MSBuildBinPath)\Microsoft.Build.Framework.dll"/>
       <Reference Include="$(MSBuildBinPath)\Microsoft.Build.Utilities.Core.dll"/>
+      <Code Type="Class" Language="cs" Source="AssemblyInfo.CodeTask.cs" />
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="AssemblyInfo" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" Condition="'$(MSBuildToolsVersion)' &gt;= '15'">
+    <ParameterGroup>
+      <FileName ParameterType="System.String" Required="true" />
+      <AssemblyVersion ParameterType="System.String" Required="false" Output="true" />
+      <AssemblyFileVersion ParameterType="System.String" Required="false" Output="true" />
+      <AssemblyInformationalVersion ParameterType="System.String" Required="false" Output="true" />
+    </ParameterGroup>
+    <Task>
       <Code Type="Class" Language="cs" Source="AssemblyInfo.CodeTask.cs" />
     </Task>
   </UsingTask>

@@ -17,6 +17,12 @@
     <Error Condition="!Exists('$(NUnitRunnerPath)')" Text="Could not find NUnit runner executable." />
 
     <Message Text="Using NUnit at: $(NUnitRunnerPath)" />
+
+    <PropertyGroup>
+      <NumberOfParallelAgents>$(NUMBER_OF_PROCESSORS)</NumberOfParallelAgents>
+      <NumberOfParallelAgents Condition="'$(NumberOfParallelAgents)' == ''">4</NumberOfParallelAgents>
+    </PropertyGroup>
+    <Message Text="Limit NUnit agent concurrency to $(NumberOfParallelAgents)" />
   </Target>
 
   <Target Name="PrepareDotCover" Condition="'$(DotCoverConfigurationFile)' != ''">
@@ -88,7 +94,7 @@
 
     <MSBuild Projects="%(NUnitTestProjects.Identity)" Condition="'%(NUnitTestProjects.DependsOn)'!=''" Targets="%(NUnitTestProjects.DependsOn)" />
 
-    <Exec Command='"$(NUnitRunnerPath)" --teamcity "%(NUnitTestProjects.TargetPath)"' />
+    <Exec Command='"$(NUnitRunnerPath)" --teamcity --agents=$(NumberOfParallelAgents) "%(NUnitTestProjects.TargetPath)"' />
   </Target>
 
   <Target Name="RunNUnitTestsWithDotCover" Condition="'$(CoverageToolName)' == 'DotCover'" DependsOnTargets="_RunNUnitTestsWithDotCover">
@@ -113,7 +119,7 @@
       <_DotCoverCoverageArguments Include='"$(DotCoverConfigurationFile)"' />
       <_DotCoverCoverageArguments Include='/Output="%(NUnitTestProjects.DotCoverSnapshot)"' />
       <_DotCoverCoverageArguments Include='/TargetExecutable="$(NUnitRunnerPath)"' />
-      <_DotCoverCoverageArguments Include='/TargetArguments="--teamcity \"%(NUnitTestProjects.TargetPath)\""' />
+      <_DotCoverCoverageArguments Include='/TargetArguments="--teamcity --agents=$(NumberOfParallelAgents) \"%(NUnitTestProjects.TargetPath)\""' />
     </ItemGroup>
     <MSBuild Projects="%(NUnitTestProjects.Identity)" Condition="'%(NUnitTestProjects.DependsOn)'!=''" Targets="%(NUnitTestProjects.DependsOn)" />
 

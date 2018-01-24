@@ -52,8 +52,13 @@
     <Target DependsOnTargets="ValidateParameters;PrepareOutputDirectory;ApplyAutoVersionNumber;ApplySemanticVersionNumber" Name="Build">
         <MSBuild Projects="@(NugetProjects)" Targets="Build" ToolsVersion="$(PreferredMSBuildToolsVersion)" BuildInParallel="true" Properties="Configuration=$(Configuration)" />
         <MSBuild Projects="@(OutputBinaryProjects)" Targets="Build" ToolsVersion="$(PreferredMSBuildToolsVersion)" BuildInParallel="true" Properties="Configuration=$(Configuration)">
-            <Output TaskParameter="TargetOutputs" ItemName="OutputBinaries" />
+            <Output TaskParameter="TargetOutputs" ItemName="_ProjectOutputBinaries" />
         </MSBuild>
+        <ItemGroup>
+            <_ProjectOutputConfigurationFiles Include="@(_ProjectOutputBinaries->'%(Identity).config')" />
+            <OutputBinaries Include="@(_ProjectOutputBinaries)" />
+            <OutputBinaries Include="%(_ProjectOutputConfigurationFiles.Identity)" Condition="Exists('%(Identity)')" />
+        </ItemGroup>
         <MSBuild Projects="@(OctoPackProjects)" Targets="Build" ToolsVersion="$(PreferredMSBuildToolsVersion)" BuildInParallel="true" Properties="Configuration=$(Configuration)" />
     </Target>
 

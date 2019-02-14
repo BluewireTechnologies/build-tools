@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <ItemGroup>
+        <!-- Full list of NuGet package projects -->
+        <NugetProjects Include="**\*.Contracts.csproj" />
+
+        <!-- Full list of NUnit test projects -->
+        <NUnitProjects Include="**\*.UnitTests.csproj" />
+    </ItemGroup>
+    <PropertyGroup>
+        <DotCoverConfigurationFile>DotCover.coverage.xml</DotCoverConfigurationFile>
+    </PropertyGroup>
+</Project>

@@ -13,7 +13,9 @@
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <!-- Keep '#warning' and some internally-suppressed warnings as warnings: -->
     <WarningsNotAsErrors>1030,1701,1702</WarningsNotAsErrors>
-    
+    <!-- Do not fail on SemVer 2 compatibility warnings when building packages. -->
+    <NoWarn>$(NoWarn),NU5105</NoWarn>
+
   </PropertyGroup>
 
   <!-- Enable stylecop analyzers for all non-release builds or a release build that's running a build in visual studio (i.e. Intellisense). -->

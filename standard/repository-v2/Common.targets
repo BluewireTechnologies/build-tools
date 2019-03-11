@@ -135,9 +135,9 @@
 
   <Target Name="PrepareBuildProperties">
     <ItemGroup>
-      <_BuildProperties Include="RestorePackagesPath=$(MSBuildProjectDirectory)\packages" />
       <_BuildProperties Include="VersionSuffix=$(SemanticTag)" />
       <_BuildProperties Include="PackageOutputPath=$(OutputDirectory)" />
+      <_BuildProperties Include="IncludeSymbols=true" />
     </ItemGroup>
     
     <ItemGroup>

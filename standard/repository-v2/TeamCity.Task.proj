@@ -67,8 +67,9 @@
             <_AllProjects Include="@(NUnitProjects)" />
             <_AllProjects Include="@(OctoPackProjects)" />
             <_AllProjects Include="@(OutputBinaryProjects)" />
+            <_AllProjects Include="SolutionPackages\SolutionPackages.*proj" />
         </ItemGroup>
-        <MSBuild Projects="@(_AllProjects)" Targets="Restore" ToolsVersion="$(PreferredMSBuildToolsVersion)" BuildInParallel="true" Properties="@(_BuildProperties)" />
+        <MSBuild Projects="@(_AllProjects)" Targets="Restore" ToolsVersion="$(PreferredMSBuildToolsVersion)" BuildInParallel="true" Properties="@(_BuildProperties);RestorePackagesPath=$(MSBuildProjectDirectory)\packages" />
     </Target>
 
     <Target Name="BuildAndTest" DependsOnTargets="Build;RunNUnitTests">

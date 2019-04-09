@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <StyleCopAnalyzersRootPath>$(MSBuildThisFileDirectory)StyleCopAnalyzers\</StyleCopAnalyzersRootPath>
+    <CommonAnalyzersRootPath>$(MSBuildThisFileDirectory)Analysers\</CommonAnalyzersRootPath>
+    <StyleCopAnalyzersRootPath>$(CommonAnalyzersRootPath)StyleCopAnalyzers\</StyleCopAnalyzersRootPath>
     <CodeAnalysisRuleSet>$(StyleCopAnalyzersRootPath)CodeAnalysisRules.ruleset</CodeAnalysisRuleSet>
     
     <!--
@@ -23,6 +24,7 @@
     <Analyzer Include="$(StyleCopAnalyzersRootPath)lib\1.0.0\Newtonsoft.Json.dll" />
     <Analyzer Include="$(StyleCopAnalyzersRootPath)lib\1.0.0\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="$(StyleCopAnalyzersRootPath)lib\1.0.0\StyleCop.Analyzers.dll" />
+    <Analyzer Include="$(CommonAnalyzersRootPath)Bluewire.Analysers\lib\netstandard1.3\Bluewire.Analysers.dll" />
   </ItemGroup>
   
   <!-- All our projects share the same style requirements -->

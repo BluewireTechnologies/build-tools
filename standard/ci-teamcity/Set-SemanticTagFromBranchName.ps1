@@ -35,6 +35,7 @@ function Get-SemanticTag($lowercaseBranch, $commitId, $masterTag)
     if ($lowercaseBranch.StartsWith("canary/")) { return "canary"; }
     if ($lowercaseBranch.StartsWith("candidate/")) { return "rc"; }
     if ($lowercaseBranch.StartsWith("release/")) { return "release"; }
+    if ($lowercaseBranch.StartsWith("backport/")) { return "beta"; }
     if ($lowercaseBranch.Equals("master")) { return "${masterTag}"; }
     return "alpha.g${commitId}";
 }

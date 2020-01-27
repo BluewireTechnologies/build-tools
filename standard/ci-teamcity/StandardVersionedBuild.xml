@@ -7,7 +7,7 @@
       <param name="Configuration" value="Release" spec="select label='Build mode' data_1='Release' data_2='Debug'" />
       <param name="SourceBranch" value="%teamcity.build.branch%" spec="text label='Semantic branch' description='Branch from which semantic tag information will be inferred.'" />
       <param name="MasterBranchSemanticTag" value="" spec="text label='Semantic tag for master'" />
-      <param name="MSBuildToolsVersion" value="14.0" spec="select label='MSBuild version' data_1='14.0' data_2='15.0'" />
+      <param name="MSBuildToolsVersion" value="16.0" spec="select label='MSBuild version' data_1='14.0' data_2='15.0' data_3='16.0'" />
       <param name="MSBuildPlatform" value="x64" spec="select label='MSBuild platform' data_1='x86' data_2='x64'" />
     </parameters>
     <build-runners>

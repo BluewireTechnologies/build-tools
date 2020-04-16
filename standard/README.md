@@ -21,8 +21,18 @@ Versioning helpers:
 * *Must* be using the PackageReference-style NuGet imports.
   * packages.config is no longer supported.
 * Any NuGet packages which are not available from public feeds must be present in `nuget-local`.
-* If running NUnit tests, expects NUnit.ConsoleRunner of an appropriate version to be depended upon by at least one project.
-  * NUnit.ConsoleRunner must be at least v3.
+* The only test framework currently supported is NUnit 3.
+  * If running NUnit tests on .NET Framework, NUnit.ConsoleRunner of an appropriate version must be depended upon by at least one project.
+    * NUnit.ConsoleRunner must be at least v3.
+  * If running NUnit tests on .NET Core, each Core test project needs to reference the following packages:
+    * Microsoft.NET.Test.Sdk
+    * TeamCity.VSTest.TestAdapter
+    * NUnit3TestAdapter
+  * Test projects targeting both Core and Framework are supported.
+* dotCover code coverage analysis is supported:
+  * If at least one project references JetBrains.dotCover.CommandLineTools, that version of dotCover will be used.
+  * When running under TeamCity, the build will fall back to using the dotCover provided by TeamCity.
+  * Locally-installed versions of dotCover *will not* be used automatically.
 
 ## Build Dependencies: `repository/`
 

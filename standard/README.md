@@ -31,7 +31,8 @@ Versioning helpers:
   * Test projects targeting both Core and Framework are supported.
 * dotCover code coverage analysis is supported:
   * If at least one project references JetBrains.dotCover.CommandLineTools, that version of dotCover will be used.
-  * When running under TeamCity, the build will fall back to using the dotCover provided by TeamCity.
+  * When running under TeamCity, the build will fall back to using the dotCover provided by TeamCity. This may be too old to
+    run .NET Core tests.
   * Locally-installed versions of dotCover *will not* be used automatically.
 
 ## Build Dependencies: `repository/`

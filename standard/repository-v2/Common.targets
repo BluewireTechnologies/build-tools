@@ -158,7 +158,8 @@
     </PropertyGroup>
     
     <ItemGroup>
-      <_DotNetTestArguments Include='--logger:teamcity "--test-adapter-path:$(TeamCityVSTestAdapterPath)"' Condition="'$(UseTeamCityLogging)' == 'True' And '$(TeamCityVSTestAdapterPath)' != ''" />
+      <!-- This does not work with dotCover: -->
+      <!-- <_DotNetTestArguments Include='&#45;&#45;logger:teamcity "&#45;&#45;test-adapter-path:$(TeamCityVSTestAdapterPath)"' Condition="'$(UseTeamCityLogging)' == 'True' And '$(TeamCityVSTestAdapterPath)' != ''" />-->
       <_DotNetTestArguments Include='"%(NUnitTestAssemblies.Identity)"' />
     </ItemGroup>
     <PropertyGroup>

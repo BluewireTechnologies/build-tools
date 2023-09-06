@@ -4,7 +4,7 @@ Components:
 * Repository scripts, which should reside in the root.
 * TeamCity version number calculation script. This needs to be set up to run before the MSBuild step which invokes TeamCity.Task.proj.
 
-When using Set-VersionsFromGit.ps1 (or the StandardVersionedBuild.xml meta-runner):
+When using the `StandardVersionedBuildDotNet.xml` meta-runner (or the old `StandardVersionedBuild.xml` meta-runner, or for strange cases the `Set-VersionsFromGit.ps1` script directly):
 * Repository root must contain .current-version file, containing only a major.minor version number.
   * If this is missing the script will quietly do nothing. The Version property will be left unset.
 * Working directory is expected to be a valid Git repository with sufficient history to analyse topology. This means using 'agent-side checkout' in TeamCity terminology.
@@ -17,7 +17,7 @@ Versioning helpers:
 ## Build Dependencies: `repository-v2/`
 
 * Visual Studio 2019 (MSBuild Tools 16.0)
-  * Later versions may work, but not yet tested.
+  * Later versions should work, but you must use the `StandardVersionedBuildDotNet.xml` meta-runner and your repository cannot contain legacy web projects.
 * *Must* be using the PackageReference-style NuGet imports.
   * packages.config is no longer supported.
 * Any NuGet packages which are not available from public feeds must be present in `nuget-local`.
@@ -51,4 +51,8 @@ Versioning helpers:
 * All files in repository/ XOR repository-v2/ should go in the root of the repository.
 * All files in versioning-auto/ may go in the root of the repository, if you need auto-versioning and use a POSIX-like shell.
 * The scripts in ci-teamcity/ may be copied into early build steps in your TeamCity build configuration.
+
+## Build.props
+
+The standard build needs to be told which projects participate, by configuring Build.props.
 

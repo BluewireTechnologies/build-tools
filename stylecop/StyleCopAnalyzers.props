@@ -19,8 +19,20 @@
     <!-- Do not fail on SemVer 2 compatibility warnings when building packages. -->
     <NoWarn>$(NoWarn),NU5105</NoWarn>
 
+    <LangVersion Condition="'$(LangVersion)' == ''">10.0</LangVersion>
     <GenerateDocumentationFile Condition="'$(GenerateDocumentationFile)' == '' and '$(GeneratePackageOnBuild)' == 'True'">True</GenerateDocumentationFile>
+    <PackageReadmeFile Condition="'$(PackageReadmeFile)' == '' and '$(GeneratePackageOnBuild)' == 'True'">README.md</PackageReadmeFile>
+
   </PropertyGroup>
+  
+  <ItemGroup Condition="'$(PackageReadmeFile)' != ''">
+    <None Remove="$(PackageReadmeFile)" />
+    <None Include="$(PackageReadmeFile)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <PackagePath>\</PackagePath>
+      <Pack>True</Pack>
+    </None>
+  </ItemGroup>
 
   <!-- Enable stylecop analyzers for all non-release builds or a release build that's running a build in visual studio (i.e. Intellisense). -->
   <ItemGroup Condition=" '$(Configuration)' != 'Release' Or '$(BuildingInsideVisualStudio)' != 'True' Or '$(BuildingProject)' != 'True' ">

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<meta-runner name="Standard Versioned Build: dotnet">
+<meta-runner name="Standard Versioned Build: dotnet debug">
   <description>Standard build, with semantic and auto-versioning.</description>
   <settings>
     <parameters>
@@ -158,7 +158,7 @@ Put-Parameter 'system.SemanticTag' $semanticTag;]]></param>
           <param name="required.sdk" value="%MSBuildSDKVersions%" />
           <param name="targets" value="BuildAndPackage" />
           <param name="teamcity.step.mode" value="default" />
-          <param name="args" value="/p:SemanticTag=%system.SemanticTag% /p:EnableSourceControlManagerQueries=false" />
+          <param name="args" value="/p:SemanticTag=%system.SemanticTag% /p:EnableSourceControlManagerQueries=false /v:diag" />
         </parameters>
       </runner>
     </build-runners>

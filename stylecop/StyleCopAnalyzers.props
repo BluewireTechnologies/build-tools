@@ -22,6 +22,13 @@
     <LangVersion Condition="'$(LangVersion)' == ''">10.0</LangVersion>
     <GenerateDocumentationFile Condition="'$(GenerateDocumentationFile)' == '' and '$(GeneratePackageOnBuild)' == 'True'">True</GenerateDocumentationFile>
     <PackageReadmeFile Condition="'$(PackageReadmeFile)' == '' and '$(GeneratePackageOnBuild)' == 'True'">README.md</PackageReadmeFile>
+    
+    <!--
+        SourceLink inspects the repository working copy for version information. Even if SourceLink is
+        disabled, this information is still fetched and injected into the AssemblyInformationalVersion.
+        This breaks our own versioning system.
+      -->
+    <EnableSourceControlManagerQueries>False</EnableSourceControlManagerQueries>
 
   </PropertyGroup>
   

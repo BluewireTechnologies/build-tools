@@ -56,3 +56,5 @@ Versioning helpers:
 
 The standard build needs to be told which projects participate, by configuring Build.props.
 
+.NET 5+ projects which build binaries should use `<PublishProjects>` instead of `<OutputBinaryProjects>`.
+
